@@ -1,0 +1,10 @@
+[project]
+name = "learn-tilelang"
+version = "0.1.0"
+description = "TileLang 学习项目：从第一个 kernel 到高性能算子"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "tilelang>=0.1.15",
+    "torch>=2.14.1",
+]
