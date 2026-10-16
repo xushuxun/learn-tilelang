@@ -8,3 +8,8 @@ dependencies = [
     "tilelang>=0.1.15",
     "torch>=2.14.1",
 ]
+
+[dependency-groups]
+dev = [
+    "matplotlib>=3.11.2",
+]
