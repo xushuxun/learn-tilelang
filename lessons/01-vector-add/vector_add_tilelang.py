@@ -28,20 +28,20 @@ def vector_add(n, block_size):
         # 这两个数字决定硬件行为（grid 维数、每 block 线程数），
         # 是程序员保留的性能决策权。
         # as bx：bx 是当前 block 的坐标（对应 CUDA 的 blockIdx.x），
-        #   with 块内的代码是"一个 block 对它名下那个 tile"的数据流描述。
+        #   with 块内的代码是"一个 block 对它负责的那个 tile"的数据流描述。
         with T.Kernel(T.ceildiv(n, block_size), threads=block_size) as bx:
             # T.Parallel 是调度原语，不是数据流。
             # 它声明：这个循环有 block_size 次迭代，这些迭代映射到 block 内的
-            # 线程上执行——映射关系、谁执行哪次、访存怎么向量化，全由编译器的
-            # Layout Inference 推导，代码里不指定。
+            # 线程上执行——映射关系、谁执行哪次、访存怎么向量化，全由编译器
+            # 推导，代码里不指定。
             # 这里迭代数等于线程数，推断结果是一一对应；
             # 改成 T.Parallel(block_size * 4) 会得到每线程 4 次迭代 + float4 向量化。
             for i in T.Parallel(block_size):
                 # 循环体是数据流的定义：这次迭代读写哪里、算什么。
-                # bx * block_size 是这个 block 名下 tile 的起始下标，
+                # bx * block_size 是这个 block 负责的那个 tile 的起始下标，
                 # + i 是 tile 内的第 i 个元素。
                 # 整行读作：block bx 的第 i 次迭代，把 A、B 对应元素相加写进 C。
-                # 没有 threadIdx，没有地址展开——那是 Lower 阶段生成物的事。
+                # 没有 threadIdx，没有地址展开——那是编译器生成物的事。
                 C[bx * block_size + i] = A[bx * block_size + i] + B[bx * block_size + i]
 
     return main
